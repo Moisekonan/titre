@@ -73,8 +73,11 @@
 //   }
 // }
 
-
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateTodoDto } from 'src/dto/create-todo.dto';
 import { TodoEntity, TodoStatus } from 'src/entities/todo.entity';
@@ -88,9 +91,15 @@ export class TodosService {
     private todoRepository: Repository<TodoEntity>,
   ) {}
 
-  async getAllTodos(user: UserEntity) {
+  async getAllTodos(user: UserEntity, status?: string) {
     try {
-      return await this.todoRepository.find({ where: { user } });
+      const where = { user };
+      if (status) {
+        where['status'] = status;
+      }
+      const data = await this.todoRepository.find({ where });
+
+      return { data: data, message: 'success', total: data.length };
     } catch (error) {
       console.log(error.stack);
       throw new NotFoundException('No todo found');
@@ -102,11 +111,11 @@ export class TodosService {
     user: UserEntity,
   ): Promise<TodoEntity> {
     const todo = new TodoEntity();
-    const { title, description } = createNewTodo;
+    const { title, description, status } = createNewTodo;
     todo.title = title;
     todo.description = description;
-    todo.status = TodoStatus.OPEN;
-    todo.user = user; // Utilisez directement la relation
+    todo.status = status;
+    todo.user = user;
 
     try {
       return await this.todoRepository.save(todo);
@@ -120,7 +129,7 @@ export class TodosService {
 
   async updateTodo(id: number, status: TodoStatus, user: UserEntity) {
     try {
-      await this.todoRepository.update({ id, user }, { status }); // Utilisez directement la relation
+      await this.todoRepository.update({ id, user }, { status });
       return this.todoRepository.findOne({ where: { id } });
     } catch (error) {
       throw new InternalServerErrorException(

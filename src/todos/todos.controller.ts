@@ -6,10 +6,11 @@ import {
   ClassSerializerInterceptor,
   Get,
   Post,
-  Patch,
+  Put,
   Delete,
   ValidationPipe,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { TodosService } from './todos.service';
 import { CreateTodoDto, TodoStatus } from 'src/dto/create-todo.dto';
@@ -25,8 +26,8 @@ export class TodosController {
   constructor(private readonly todoService: TodosService) {}
 
   @Get()
-  getTodos(@User() user: UserEntity) {
-    return this.todoService.getAllTodos(user);
+  getTodos(@User() user: UserEntity, @Query('status') status: string) {
+    return this.todoService.getAllTodos(user, status);
   }
 
   @Post()
@@ -34,7 +35,7 @@ export class TodosController {
     return this.todoService.createTodo(createTodoDto, user);
   }
 
-  @Patch('/:id')
+  @Put('/:id')
   updateTodo(
     @Body('status', TodoStatusValidationPipe) status: TodoStatus,
     @Param('id') id: number,
