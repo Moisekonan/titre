@@ -13,10 +13,13 @@ import {
   Query,
 } from '@nestjs/common';
 import { TodosService } from './todos.service';
-import { CreateTodoDto, TodoStatus } from 'src/dto/create-todo.dto';
-import { TodoStatusValidationPipe } from 'src/pipes/TodoStatusValidator.pipe';
+import {
+  CreateTodoDto,
+  TodoStatus,
+} from 'src/features/todos/dto/create-todo.dto';
+import { TodoStatusValidationPipe } from 'src/utils/pipes/TodoStatusValidator.pipe';
 import { AuthGuard } from '@nestjs/passport';
-import { User } from 'src/auth/user.decorator';
+import { User } from 'src/features/auth/user.decorator';
 import { UserEntity } from 'src/entities/user.entity';
 
 @UseInterceptors(ClassSerializerInterceptor)
@@ -31,7 +34,10 @@ export class TodosController {
   }
 
   @Post()
-  createNewTodo(@Body(ValidationPipe) createTodoDto: CreateTodoDto, @User() user: UserEntity) {
+  createNewTodo(
+    @Body(ValidationPipe) createTodoDto: CreateTodoDto,
+    @User() user: UserEntity,
+  ) {
     return this.todoService.createTodo(createTodoDto, user);
   }
 
@@ -45,7 +51,7 @@ export class TodosController {
   }
 
   @Delete('/:id')
-  deleteTodo(@Param('id') id: number, @User() user: UserEntity){
+  deleteTodo(@Param('id') id: number, @User() user: UserEntity) {
     return this.todoService.deleteTodo(id, user);
   }
 }

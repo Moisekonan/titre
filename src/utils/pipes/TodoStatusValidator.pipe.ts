@@ -3,7 +3,7 @@ import {
   BadRequestException,
   PipeTransform,
 } from '@nestjs/common';
-import { TodoStatus } from '../entities/todo.entity';
+import { TodoStatus } from '../../entities/todo.entity';
 
 export class TodoStatusValidationPipe implements PipeTransform {
   readonly allowedStatus = [
@@ -23,7 +23,6 @@ export class TodoStatusValidationPipe implements PipeTransform {
 
   private isStatusValid(status: any) {
     const index = this.allowedStatus.indexOf(status);
-
     return index !== -1;
   }
 }

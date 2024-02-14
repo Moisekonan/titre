@@ -1,6 +1,7 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 // import * as bcrypt from 'bcryptjs';
 import { TodoEntity } from './todo.entity';
+import { ProfileEntity } from './profile.entity';
 
 @Entity('users')
 export class UserEntity {
@@ -15,6 +16,9 @@ export class UserEntity {
 
   @Column()
   salt: string;
+
+  @OneToOne(() => ProfileEntity, profile => profile.user, { cascade: true })
+  profile: ProfileEntity;
 
   @OneToMany(() => TodoEntity, (todo) => todo.user)
   todos: TodoEntity[];

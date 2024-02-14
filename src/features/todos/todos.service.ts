@@ -79,7 +79,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CreateTodoDto } from 'src/dto/create-todo.dto';
+import { CreateTodoDto } from 'src/features/todos/dto/create-todo.dto';
 import { TodoEntity, TodoStatus } from 'src/entities/todo.entity';
 import { UserEntity } from 'src/entities/user.entity';
 import { Repository } from 'typeorm';

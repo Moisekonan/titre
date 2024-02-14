@@ -17,9 +17,6 @@ export class TodoEntity {
 
   @ManyToOne(() => UserEntity, (user) => user.todos)
   user: UserEntity;
-
-//   @Column()
-//   userId: number;
 }
 
 export enum TodoStatus {

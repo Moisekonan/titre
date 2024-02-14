@@ -4,12 +4,13 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { UserEntity } from '../entities/user.entity';
+import { UserEntity } from '../../entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { RegisterUserDto } from 'src/dto/registerUser.dto';
+import { RegisterUserDto } from 'src/features/auth/dto/registerUser.dto';
 import * as bcrypt from 'bcryptjs';
-import { UserLoginDto } from 'src/dto/userLogin.dto';
+import { UserLoginDto } from 'src/features/auth/dto/userLogin.dto';
 import { JwtService } from '@nestjs/jwt';
+import { ProfileEntity } from 'src/entities/profile.entity';
 
 @Injectable()
 export class AuthService {
@@ -20,7 +21,15 @@ export class AuthService {
   ) {}
 
   async register(registerDTO: RegisterUserDto) {
-    const { username, password } = registerDTO;
+    const {
+      username,
+      password,
+      email,
+      firstName,
+      lastName,
+      phoneNumber,
+      dateOfBirth,
+    } = registerDTO;
     const hashed = await bcrypt.hash(password, 12);
     const salt = bcrypt.getSalt(hashed);
 
@@ -28,6 +37,17 @@ export class AuthService {
     user.username = username;
     user.password = hashed;
     user.salt = salt;
+
+    // Créer un profil utilisateur associé
+    const profile = new ProfileEntity();
+    profile.email = email;
+    profile.firstName = firstName;
+    profile.lastName = lastName;
+    profile.phoneNumber = phoneNumber;
+    profile.dateOfBirth = dateOfBirth;
+
+    // Associer le profil à l'utilisateur
+    user.profile = profile;
 
     this.userRepository.create(user);
 
@@ -59,7 +79,7 @@ export class AuthService {
         expiresIn: '1h',
         algorithm: 'HS256',
       });
-      return { token: jwtToken };
+      return { token: jwtToken, message: 'Login success' };
     } else {
       throw new UnauthorizedException(
         "Informations d'identification invalides.",
@@ -67,9 +87,17 @@ export class AuthService {
     }
   }
 
+  async getProfile(user: UserEntity) {
+    console.log(user.id);
+    return await this.userRepository.findOne({
+      where: { id: user.id },
+      relations: ['profile'],
+    });
+  }
+
   async logout(user: UserEntity) {
     const token = await this.jwt.signAsync(
-      {username: user.username},
+      { username: user.username },
       { expiresIn: 0, algorithm: 'HS256' },
     );
     return { token };

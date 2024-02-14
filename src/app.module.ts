@@ -1,15 +1,17 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { TodosModule } from './todos/todos.module';
+import { TodosModule } from './features/todos/todos.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuthModule } from './auth/auth.module';
-import { AuthMiddleware } from './auth/auth.middleware';
+import { AuthModule } from './features/auth/auth.module';
+import { AuthMiddleware } from './features/auth/auth.middleware';
+import { UsersModule } from './features/users/users.module';
 
 @Module({
   imports: [
     TodosModule,
     AuthModule,
+    UsersModule,
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: 'localhost',
